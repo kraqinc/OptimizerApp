@@ -1,7 +1,0 @@
-com.orionn.optimizer.app-pngs-0 /data/data/com.termux/files/home/OptimizerApp/app/build/generated/res/pngs/debug
-com.orionn.optimizer.app-resValues-1 /data/data/com.termux/files/home/OptimizerApp/app/build/generated/res/resValues/debug
-com.orionn.optimizer.app-packageDebugResources-2 /data/data/com.termux/files/home/OptimizerApp/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.orionn.optimizer.app-packageDebugResources-3 /data/data/com.termux/files/home/OptimizerApp/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.orionn.optimizer.app-merged_res-4 /data/data/com.termux/files/home/OptimizerApp/app/build/intermediates/merged_res/debug
-com.orionn.optimizer.app-debug-5 /data/data/com.termux/files/home/OptimizerApp/app/src/debug/res
-com.orionn.optimizer.app-main-6 /data/data/com.termux/files/home/OptimizerApp/app/src/main/res
