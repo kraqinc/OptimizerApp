@@ -2,19 +2,15 @@ package com.orionn.optimizer.utils;
 
 import java.util.Locale;
 
-public class LanguageDetector {
+public final class LanguageDetector {
+    private LanguageDetector() {
+    }
 
     public static String getLanguage() {
-
-        Locale locale = Locale.getDefault();
-        return locale.getLanguage();
+        return Locale.getDefault().getLanguage();
     }
 
     public static boolean isSpanish() {
-        return getLanguage().equals("es");
-    }
-
-    public static boolean isEnglish() {
-        return getLanguage().equals("en");
+        return "es".equalsIgnoreCase(getLanguage());
     }
 }

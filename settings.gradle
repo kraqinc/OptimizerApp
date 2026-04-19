@@ -13,4 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-include ':app'
+rootProject.name = "OptimizerApp"
+include(":app")
