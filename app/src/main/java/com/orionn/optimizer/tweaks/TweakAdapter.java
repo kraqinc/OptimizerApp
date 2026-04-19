@@ -69,8 +69,6 @@ public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
         holder.toggle.setChecked(item.enabled);
 
         holder.itemView.setAlpha(item.enabled ? 1f : 0.88f);
-        holder.itemView.setScaleX(item.enabled ? 1.01f : 1f);
-        holder.itemView.setScaleY(item.enabled ? 1.01f : 1f);
 
         holder.toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             item.enabled = isChecked;

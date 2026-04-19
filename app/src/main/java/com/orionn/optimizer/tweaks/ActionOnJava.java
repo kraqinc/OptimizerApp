@@ -6,8 +6,6 @@ import com.orionn.optimizer.core.TweakItem;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public final class ActionOnJava {
@@ -23,28 +21,22 @@ public final class ActionOnJava {
             return "Tu sistema no es compatible con este tweak aún";
         }
 
-        List<String> actions = enabled ? item.onEnable : item.onDisable;
+        java.util.List<String> actions = enabled ? item.onEnable : item.onDisable;
         if (actions == null || actions.isEmpty()) {
             return enabled ? "No hay acciones al activar" : "No hay acciones al desactivar";
         }
 
-        List<String> results = new ArrayList<>();
+        StringBuilder out = new StringBuilder();
+
         for (String action : actions) {
             String result = executeAction(action);
-            if (!result.isEmpty()) {
-                results.add(result);
+            if (result != null && !result.isEmpty()) {
+                out.append(result).append('\n');
             }
         }
 
-        if (results.isEmpty()) {
-            return "Aplicado";
-        }
-
-        StringBuilder builder = new StringBuilder();
-        for (String line : results) {
-            builder.append(line).append('\n');
-        }
-        return builder.toString().trim();
+        String text = out.toString().trim();
+        return text.isEmpty() ? "Aplicado" : text;
     }
 
     private static String executeAction(String action) {
@@ -82,7 +74,7 @@ public final class ActionOnJava {
                 break;
         }
 
-        String output = runCommand(command);
+        String output = run(command);
         if (output.isEmpty()) {
             return clean + " OK";
         }
@@ -90,26 +82,18 @@ public final class ActionOnJava {
         return clean + " " + output;
     }
 
-    private static String runCommand(String command) {
-        String shellResult = runWithShell(command);
-        if (!shellResult.isEmpty()) {
-            return shellResult;
+    private static String run(String command) {
+        String out = runProcess(new String[]{"sh", "-c", command});
+        if (!out.isEmpty()) {
+            return out;
         }
 
-        String rootResult = runWithSu(command);
-        if (!rootResult.isEmpty()) {
-            return rootResult;
+        out = runProcess(new String[]{"su", "-c", command});
+        if (!out.isEmpty()) {
+            return out;
         }
 
         return "";
-    }
-
-    private static String runWithShell(String command) {
-        return runProcess(new String[]{"sh", "-c", command});
-    }
-
-    private static String runWithSu(String command) {
-        return runProcess(new String[]{"su", "-c", command});
     }
 
     private static String runProcess(String[] cmd) {

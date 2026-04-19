@@ -8,7 +8,7 @@ public class TweakItem {
     public String description = "";
     public String risk = "low";
     public String warning = "";
-    public int minAndroid = 23;
+    public int minAndroid = 24;
     public boolean requiresShizuku = false;
     public boolean enabled = false;
     public String sourceFileName = "";

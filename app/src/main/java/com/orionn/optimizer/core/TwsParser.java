@@ -57,7 +57,7 @@ public final class TwsParser {
                         break;
                     case "requires_shizuku":
                     case "requiresshizuku":
-                        item.requiresShizuku = parseBoolean(value);
+                        item.requiresShizuku = "true".equalsIgnoreCase(value) || "1".equals(value) || "yes".equalsIgnoreCase(value);
                         break;
                     case "on_enable":
                         parseList(value, item.onEnable);
@@ -84,10 +84,6 @@ public final class TwsParser {
         }
 
         return item;
-    }
-
-    private static boolean parseBoolean(String value) {
-        return "true".equalsIgnoreCase(value) || "1".equals(value) || "yes".equalsIgnoreCase(value);
     }
 
     private static void parseList(String raw, java.util.List<String> out) {

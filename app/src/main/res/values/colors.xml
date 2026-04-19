@@ -1,6 +1,10 @@
 <resources>
-    <color name="bg_main">#0B0B0F</color>
-    <color name="card_bg">#15151B</color>
+    <color name="bg_main">#0B0D12</color>
+    <color name="card_bg">#121722</color>
+    <color name="card_bg_2">#171D2A</color>
     <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#8A8A95</color>
+    <color name="text_secondary">#9AA4B2</color>
+    <color name="accent">#7C4DFF</color>
+    <color name="accent_2">#00E5FF</color>
+    <color name="accent_3">#00FF95</color>
 </resources>

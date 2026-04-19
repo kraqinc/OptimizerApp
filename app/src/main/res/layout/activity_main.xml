@@ -1,82 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main">
+    android:background="#0A0A0A">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
+        android:id="@+id/pageRam"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="20dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <TextView
-            android:id="@+id/title"
-            android:text="Optimizer"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"
+            android:id="@+id/ramInfo"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="RAM"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
+    </FrameLayout>
 
-        <TextView
-            android:text="Sistema optimizado"
-            android:textColor="@color/text_secondary"
-            android:layout_marginTop="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_marginTop="20dp"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="8dp"
-            android:backgroundTint="@color/card_bg">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:text="RAM"
-                    android:textColor="@color/text_secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/ramValue"
-                    android:text="--%"
-                    android:textSize="26sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginTop="6dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+    <FrameLayout
+        android:id="@+id/pageTweaks"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tweaksList"
+            android:id="@+id/recyclerTweaks"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="16dp"/>
+            android:layout_height="match_parent"/>
+    </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/pageSystem"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/systemInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SYSTEM"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:background="#111111">
+
+        <TextView
+            android:id="@+id/tabRam"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="RAM"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:id="@+id/tabTweaks"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="TWEAKS"
+            android:textColor="#888888"/>
+
+        <TextView
+            android:id="@+id/tabSystem"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="SYSTEM"
+            android:textColor="#888888"/>
     </LinearLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="@color/card_bg"
-        app:itemIconTint="@color/text_secondary"
-        app:itemTextColor="@color/text_secondary"
-        app:menu="@menu/bottom_menu"/>
-
-</FrameLayout>
+</LinearLayout>
