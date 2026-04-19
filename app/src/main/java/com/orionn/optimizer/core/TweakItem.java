@@ -15,4 +15,5 @@ public class TweakItem {
     public final List<String> onEnable = new ArrayList<>();
     public final List<String> onDisable = new ArrayList<>();
     public final List<String> tags = new ArrayList<>();
+    public final List<String> packages = new ArrayList<>();
 }

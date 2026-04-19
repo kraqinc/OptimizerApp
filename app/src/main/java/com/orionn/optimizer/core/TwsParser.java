@@ -57,20 +57,24 @@ public final class TwsParser {
                         break;
                     case "requires_shizuku":
                     case "requiresshizuku":
-                        item.requiresShizuku = "true".equalsIgnoreCase(value) || "1".equals(value) || "yes".equalsIgnoreCase(value);
+                        item.requiresShizuku = isTrue(value);
                         break;
                     case "on_enable":
-                        parseList(value, item.onEnable);
+                        splitList(value, item.onEnable);
                         break;
                     case "on_disable":
-                        parseList(value, item.onDisable);
+                        splitList(value, item.onDisable);
                         break;
                     case "tags":
-                        parseList(value, item.tags);
+                        splitList(value, item.tags);
+                        break;
+                    case "packages":
+                    case "targets":
+                        splitList(value, item.packages);
                         break;
                     default:
                         if (key.startsWith("action")) {
-                            parseList(value, item.onEnable);
+                            splitList(value, item.onEnable);
                         }
                         break;
                 }
@@ -86,16 +90,20 @@ public final class TwsParser {
         return item;
     }
 
-    private static void parseList(String raw, java.util.List<String> out) {
+    private static boolean isTrue(String value) {
+        return "true".equalsIgnoreCase(value) || "1".equals(value) || "yes".equalsIgnoreCase(value);
+    }
+
+    private static void splitList(String raw, java.util.List<String> out) {
         if (raw == null || raw.trim().isEmpty()) {
             return;
         }
 
         String[] parts = raw.split("\\|");
         for (String part : parts) {
-            String action = part.trim();
-            if (!action.isEmpty()) {
-                out.add(action);
+            String item = part.trim();
+            if (!item.isEmpty()) {
+                out.add(item);
             }
         }
     }

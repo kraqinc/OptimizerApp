@@ -4,5 +4,6 @@ risk=medium
 warning=Puede aumentar el consumo y la temperatura
 min_android=24
 requires_shizuku=false
-on_enable=close_background_apps|reduce_animations|boost_performance
+packages=com.facebook.katana|com.instagram.android|com.tiktok.android
+on_enable=close_background_apps|reduce_animations|boost_performance|set_refresh_rate:120
 on_disable=restore_default
