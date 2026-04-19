@@ -1,7 +1,8 @@
-name: Smart Build OptimizerApp
+name: Build APK
 
 on:
   push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -12,35 +13,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Grant gradlew permission
+      - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Detect Gradle tasks
-        run: ./gradlew tasks --all
-
-      - name: Smart build fallback
-        run: |
-          echo "Trying build options..."
-
-          ./gradlew assembleDebug || \
-          ./gradlew :app:assembleDebug || \
-          ./gradlew build || \
-          ./gradlew assemble || \
-          (echo "❌ No valid Gradle task found" && exit 1)
-
-      - name: Find APK
-        run: find . -name "*.apk"
+      - name: Build APK
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: OptimizerApp-APK
-          path: |
-            **/outputs/apk/**/*.apk
-            **/*.apk
+          name: OptimizerApp
+          path: app/build/outputs/apk/debug/app-debug.apk
