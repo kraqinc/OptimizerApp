@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StatFs;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -12,10 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
 import com.orionn.optimizer.core.TwsAssetInstaller;
 import com.orionn.optimizer.core.TwsRepository;
 import com.orionn.optimizer.tweaks.TweakAdapter;
@@ -28,25 +29,25 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private View pageRam;
-    private View pageTweaks;
+    private RecyclerView pageTweaks;
     private View pageSystem;
 
     private TextView ramInfo;
     private TextView storageInfo;
     private TextView systemInfo;
-    private androidx.recyclerview.widget.RecyclerView recyclerTweaks;
-    private TweakAdapter adapter;
 
     private LinearLayout tabRam;
     private LinearLayout tabTweaks;
     private LinearLayout tabSystem;
+
+    private TweakAdapter adapter;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TwsAssetInstaller.install(this);
-
         setContentView(R.layout.activity_main);
 
         pageRam = findViewById(R.id.pageRam);
@@ -57,34 +58,44 @@ public class MainActivity extends AppCompatActivity {
         storageInfo = findViewById(R.id.storageInfo);
         systemInfo = findViewById(R.id.systemInfo);
 
-        recyclerTweaks = findViewById(R.id.recyclerTweaks);
-        recyclerTweaks.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new TweakAdapter(this, (item, enabled, result) ->
-                Toast.makeText(this, item.name + ": " + result, Toast.LENGTH_LONG).show()
-        );
-        recyclerTweaks.setAdapter(adapter);
-
         tabRam = findViewById(R.id.tabRam);
         tabTweaks = findViewById(R.id.tabTweaks);
         tabSystem = findViewById(R.id.tabSystem);
+
+        BlurUtils.applySoftBlur(findViewById(R.id.blurLayer));
+        animateEntry(findViewById(R.id.headerCard));
+
+        pageTweaks.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new TweakAdapter(this, (item, enabled, result) ->
+                Toast.makeText(this, item.name + ": " + result, Toast.LENGTH_LONG).show()
+        );
+        pageTweaks.setAdapter(adapter);
 
         tabRam.setOnClickListener(v -> showPage(0));
         tabTweaks.setOnClickListener(v -> showPage(1));
         tabSystem.setOnClickListener(v -> showPage(2));
 
-        BlurUtils.applySoftBlur(findViewById(R.id.blurLayer));
-        animateIn(findViewById(R.id.headerCard));
-
-        refreshRam();
-        refreshTweaks();
-        refreshSystem();
-
         showPage(0);
+        refreshAll();
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshRam();
+                refreshTweaks();
+                refreshSystem();
+                handler.postDelayed(this, 1500);
+            }
+        }, 1500);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        refreshAll();
+    }
+
+    private void refreshAll() {
         refreshRam();
         refreshTweaks();
         refreshSystem();
@@ -92,19 +103,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void showPage(int index) {
         pageRam.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
-        recyclerTweaks.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
+        pageTweaks.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
         pageSystem.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
 
-        tabRam.setActivated(index == 0);
-        tabTweaks.setActivated(index == 1);
-        tabSystem.setActivated(index == 2);
+        setSelected(tabRam, index == 0);
+        setSelected(tabTweaks, index == 1);
+        setSelected(tabSystem, index == 2);
+    }
+
+    private void setSelected(View view, boolean selected) {
+        if (view != null) {
+            view.setAlpha(selected ? 1f : 0.65f);
+            view.animate()
+                    .scaleX(selected ? 1.05f : 1f)
+                    .scaleY(selected ? 1.05f : 1f)
+                    .setDuration(180)
+                    .start();
+        }
     }
 
     private void refreshRam() {
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if (am != null) {
-            am.getMemoryInfo(memoryInfo);
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (activityManager != null) {
+            activityManager.getMemoryInfo(memoryInfo);
         }
 
         long totalRam = memoryInfo.totalMem;
@@ -166,16 +188,17 @@ public class MainActivity extends AppCompatActivity {
         return String.format(Locale.US, "%.2f %s", value, units[unit]);
     }
 
-    private void animateIn(View view) {
+    private void animateEntry(View view) {
         if (view == null) {
             return;
         }
+
         view.setAlpha(0f);
-        view.setTranslationY(30f);
+        view.setTranslationY(28f);
         view.animate()
                 .alpha(1f)
                 .translationY(0f)
-                .setDuration(420)
+                .setDuration(380)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .start();
     }

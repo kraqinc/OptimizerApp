@@ -1,0 +1,8 @@
+name=Power Save
+description=Reduce consumo y prioriza batería
+risk=low
+warning=Puede bajar el rendimiento
+min_android=23
+requires_shizuku=false
+on_enable=battery_saver|reduce_animations
+on_disable=restore_default

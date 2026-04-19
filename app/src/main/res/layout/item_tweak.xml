@@ -1,50 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_margin="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="#121722"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="0dp">
+    android:backgroundTint="@color/card_bg"
+    app:cardCornerRadius="20dp">
 
     <LinearLayout
+        android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tweakName"
+        <LinearLayout
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tweakName"
+                android:text="Tweak"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/tweakDesc"
+                android:text="Descripción"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/toggle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tweakDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textColor="#9AA4B2"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tweakMeta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="#7C4DFF"
-            android:textSize="12sp" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/tweakSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Activar"
-            android:textColor="#FFFFFF" />
-
+            android:layout_height="wrap_content"/>
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+</androidx.cardview.widget.CardView>

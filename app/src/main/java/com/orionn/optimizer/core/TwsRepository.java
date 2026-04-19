@@ -15,6 +15,7 @@ public final class TwsRepository {
         if (base == null) {
             base = context.getFilesDir();
         }
+
         File dir = new File(base, "tweaks_repo");
         if (!dir.exists()) {
             dir.mkdirs();
@@ -22,23 +23,29 @@ public final class TwsRepository {
         return dir;
     }
 
-    public static List<File> listTweaks(Context context) {
-        File dir = getRepoDir(context);
-        List<File> files = new ArrayList<>();
-        File[] arr = dir.listFiles();
-        if (arr == null) {
-            return files;
+    public static File getTweakFile(Context context, String name) {
+        String fileName = name == null ? "unknown.tws" : name.trim();
+        if (!fileName.endsWith(".tws")) {
+            fileName = fileName + ".tws";
         }
-        for (File file : arr) {
-            if (file.isFile() && file.getName().endsWith(".tws")) {
-                files.add(file);
-            }
-        }
-        return files;
+        return new File(getRepoDir(context), fileName);
     }
 
-    public static File getTweak(Context context, String name) {
-        String fileName = name.endsWith(".tws") ? name : name + ".tws";
-        return new File(getRepoDir(context), fileName);
+    public static List<File> listTweaks(Context context) {
+        List<File> result = new ArrayList<>();
+        File dir = getRepoDir(context);
+        File[] files = dir.listFiles();
+
+        if (files == null) {
+            return result;
+        }
+
+        for (File file : files) {
+            if (file.isFile() && file.getName().endsWith(".tws")) {
+                result.add(file);
+            }
+        }
+
+        return result;
     }
 }

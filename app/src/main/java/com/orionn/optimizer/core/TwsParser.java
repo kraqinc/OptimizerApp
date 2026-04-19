@@ -11,6 +11,7 @@ public final class TwsParser {
 
     public static TweakItem parse(File file) {
         TweakItem item = new TweakItem();
+
         if (file == null || !file.exists()) {
             return item;
         }
@@ -21,6 +22,7 @@ public final class TwsParser {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
+
                 if (line.isEmpty() || line.startsWith("#") || line.startsWith(";")) {
                     continue;
                 }
@@ -55,17 +57,20 @@ public final class TwsParser {
                         break;
                     case "requires_shizuku":
                     case "requiresshizuku":
-                        item.requiresShizuku = "true".equalsIgnoreCase(value) || "1".equals(value);
+                        item.requiresShizuku = parseBoolean(value);
                         break;
                     case "on_enable":
-                        splitActions(value, item.onEnable);
+                        parseList(value, item.onEnable);
                         break;
                     case "on_disable":
-                        splitActions(value, item.onDisable);
+                        parseList(value, item.onDisable);
+                        break;
+                    case "tags":
+                        parseList(value, item.tags);
                         break;
                     default:
                         if (key.startsWith("action")) {
-                            splitActions(value, item.onEnable);
+                            parseList(value, item.onEnable);
                         }
                         break;
                 }
@@ -74,21 +79,27 @@ public final class TwsParser {
         }
 
         if (item.name.isEmpty()) {
-            item.name = file.getName().replace(".tws", "");
+            String fileName = file.getName();
+            item.name = fileName.endsWith(".tws") ? fileName.substring(0, fileName.length() - 4) : fileName;
         }
 
         return item;
     }
 
-    private static void splitActions(String value, java.util.List<String> out) {
-        if (value == null) {
+    private static boolean parseBoolean(String value) {
+        return "true".equalsIgnoreCase(value) || "1".equals(value) || "yes".equalsIgnoreCase(value);
+    }
+
+    private static void parseList(String raw, java.util.List<String> out) {
+        if (raw == null || raw.trim().isEmpty()) {
             return;
         }
-        String[] parts = value.split("\\|");
+
+        String[] parts = raw.split("\\|");
         for (String part : parts) {
-            String a = part.trim();
-            if (!a.isEmpty()) {
-                out.add(a);
+            String action = part.trim();
+            if (!action.isEmpty()) {
+                out.add(action);
             }
         }
     }

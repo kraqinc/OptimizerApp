@@ -11,7 +11,8 @@ public class TweakItem {
     public int minAndroid = 23;
     public boolean requiresShizuku = false;
     public boolean enabled = false;
+    public String sourceFileName = "";
     public final List<String> onEnable = new ArrayList<>();
     public final List<String> onDisable = new ArrayList<>();
-    public String sourceFileName = "";
+    public final List<String> tags = new ArrayList<>();
 }

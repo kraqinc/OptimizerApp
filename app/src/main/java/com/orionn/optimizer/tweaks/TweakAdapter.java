@@ -5,16 +5,15 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.materialswitch.MaterialSwitch;
+import com.orionn.optimizer.R;
 import com.orionn.optimizer.core.TweakItem;
 import com.orionn.optimizer.core.TwsParser;
-import com.orionn.optimizer.databinding.ItemTweakBinding;
-import com.orionn.optimizer.utils.BlurUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,23 +21,24 @@ import java.util.List;
 
 public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
 
-    public interface OnTweakChanged {
+    public interface Listener {
         void onChanged(TweakItem item, boolean enabled, String result);
     }
 
     private final Context context;
-    private final List<TweakItem> items = new ArrayList<>();
     private final SharedPreferences prefs;
-    private final OnTweakChanged callback;
+    private final Listener listener;
+    private final List<TweakItem> items = new ArrayList<>();
 
-    public TweakAdapter(Context context, OnTweakChanged callback) {
+    public TweakAdapter(Context context, Listener listener) {
         this.context = context;
-        this.callback = callback;
+        this.listener = listener;
         this.prefs = context.getSharedPreferences("optimizer_tweaks", Context.MODE_PRIVATE);
     }
 
     public void setFiles(List<File> files) {
         items.clear();
+
         if (files != null) {
             for (File file : files) {
                 TweakItem item = TwsParser.parse(file);
@@ -46,38 +46,39 @@ public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
                 items.add(item);
             }
         }
+
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemTweakBinding binding = ItemTweakBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new VH(binding);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tweak, parent, false);
+        return new VH(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         TweakItem item = items.get(position);
 
-        holder.binding.tweakName.setText(item.name);
-        holder.binding.tweakDesc.setText(item.description);
-        holder.binding.tweakMeta.setText("Riesgo: " + item.risk + "   Archivo: " + item.sourceFileName);
-        holder.binding.tweakSwitch.setChecked(item.enabled);
+        holder.name.setText(item.name);
+        holder.desc.setText(item.description == null || item.description.isEmpty() ? "Sin descripción" : item.description);
+        holder.meta.setText("Riesgo: " + item.risk + "   Archivo: " + item.sourceFileName);
 
-        BlurUtils.applySoftBlur(holder.binding.getRoot());
+        holder.toggle.setOnCheckedChangeListener(null);
+        holder.toggle.setChecked(item.enabled);
 
-        holder.binding.tweakSwitch.setOnCheckedChangeListener(null);
-        holder.binding.tweakSwitch.setChecked(item.enabled);
-        holder.binding.tweakSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        holder.itemView.setAlpha(item.enabled ? 1f : 0.88f);
+        holder.itemView.setScaleX(item.enabled ? 1.01f : 1f);
+        holder.itemView.setScaleY(item.enabled ? 1.01f : 1f);
+
+        holder.toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             item.enabled = isChecked;
             prefs.edit().putBoolean(item.sourceFileName, isChecked).apply();
 
-            String result = ActionOnJava.applyTweak(item);
-            if (callback != null) {
-                callback.onChanged(item, isChecked, result);
-            } else {
-                Toast.makeText(context, result, Toast.LENGTH_LONG).show();
+            String result = ActionOnJava.applyTweak(item, isChecked);
+            if (listener != null) {
+                listener.onChanged(item, isChecked, result);
             }
         });
     }
@@ -87,12 +88,18 @@ public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
         return items.size();
     }
 
-    public static final class VH extends RecyclerView.ViewHolder {
-        final ItemTweakBinding binding;
+    static final class VH extends RecyclerView.ViewHolder {
+        final TextView name;
+        final TextView desc;
+        final TextView meta;
+        final Switch toggle;
 
-        VH(ItemTweakBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
+        VH(View itemView) {
+            super(itemView);
+            name = itemView.findViewById(R.id.tweakName);
+            desc = itemView.findViewById(R.id.tweakDesc);
+            meta = itemView.findViewById(R.id.tweakMeta);
+            toggle = itemView.findViewById(R.id.tweakSwitch);
         }
     }
 }

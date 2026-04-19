@@ -13,25 +13,26 @@ public final class TwsAssetInstaller {
 
     public static int install(Context context) {
         int count = 0;
+
         try {
-            String[] files = context.getAssets().list("tweaks_repo");
-            if (files == null) {
+            String[] list = context.getAssets().list("tweaks_repo");
+            if (list == null) {
                 return 0;
             }
 
             File targetDir = TwsRepository.getRepoDir(context);
 
-            for (String fileName : files) {
-                if (fileName == null || !fileName.endsWith(".tws")) {
+            for (String name : list) {
+                if (name == null || !name.endsWith(".tws")) {
                     continue;
                 }
 
-                File target = new File(targetDir, fileName);
+                File target = new File(targetDir, name);
                 if (target.exists()) {
                     continue;
                 }
 
-                try (InputStream in = context.getAssets().open("tweaks_repo/" + fileName)) {
+                try (InputStream in = context.getAssets().open("tweaks_repo/" + name)) {
                     FileUtils.copy(in, target);
                     count++;
                 } catch (Exception ignored) {
@@ -39,6 +40,7 @@ public final class TwsAssetInstaller {
             }
         } catch (Exception ignored) {
         }
+
         return count;
     }
 }
