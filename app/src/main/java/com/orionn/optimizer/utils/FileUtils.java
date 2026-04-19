@@ -4,23 +4,26 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-public final class FileUtils {
-    private FileUtils() {
-    }
+public class FileUtils {
 
-    public static void copy(InputStream inputStream, File target) throws Exception {
-        File parent = target.getParentFile();
+    public static void ensureParent(File file) {
+        File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
+    }
 
-        try (InputStream in = inputStream; FileOutputStream out = new FileOutputStream(target)) {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            out.flush();
+    public static void copyStream(InputStream in, File outFile) throws Exception {
+        ensureParent(outFile);
+        FileOutputStream out = new FileOutputStream(outFile);
+
+        byte[] buffer = new byte[4096];
+        int len;
+        while ((len = in.read(buffer)) > 0) {
+            out.write(buffer, 0, len);
         }
+
+        out.close();
+        in.close();
     }
 }
