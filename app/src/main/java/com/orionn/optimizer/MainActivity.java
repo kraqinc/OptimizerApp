@@ -1,263 +1,156 @@
 package com.orionn.optimizer;
 
-import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.StatFs;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.orionn.optimizer.core.TWSAssetInstaller;
-import com.orionn.optimizer.core.TWSParser;
-import com.orionn.optimizer.core.TWSProfile;
-import com.orionn.optimizer.core.TWSRepository;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.android.material.card.MaterialCardView;
+import com.orionn.optimizer.core.TwsAssetInstaller;
+import com.orionn.optimizer.core.TwsRepository;
+import com.orionn.optimizer.tweaks.TweakAdapter;
+import com.orionn.optimizer.utils.BlurUtils;
 
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
-    private TextView ramPanel;
-    private TextView tweaksPanel;
-    private TextView systemPanel;
+    private View pageRam;
+    private View pageTweaks;
+    private View pageSystem;
 
-    private LinearLayout ramPage;
-    private LinearLayout tweaksPage;
-    private LinearLayout systemPage;
+    private TextView ramInfo;
+    private TextView storageInfo;
+    private TextView systemInfo;
+    private androidx.recyclerview.widget.RecyclerView recyclerTweaks;
+    private TweakAdapter adapter;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private LinearLayout tabRam;
+    private LinearLayout tabTweaks;
+    private LinearLayout tabSystem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TWSAssetInstaller.installBundledTweaks(this);
+        TwsAssetInstaller.install(this);
 
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        ));
+        setContentView(R.layout.activity_main);
 
-        LinearLayout content = new LinearLayout(this);
-        content.setOrientation(LinearLayout.VERTICAL);
-        content.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-        ));
+        pageRam = findViewById(R.id.pageRam);
+        pageTweaks = findViewById(R.id.recyclerTweaks);
+        pageSystem = findViewById(R.id.pageSystem);
 
-        ramPage = createPage();
-        tweaksPage = createPage();
-        systemPage = createPage();
+        ramInfo = findViewById(R.id.ramInfo);
+        storageInfo = findViewById(R.id.storageInfo);
+        systemInfo = findViewById(R.id.systemInfo);
 
-        ramPanel = createPanelText();
-        tweaksPanel = createPanelText();
-        systemPanel = createPanelText();
+        recyclerTweaks = findViewById(R.id.recyclerTweaks);
+        recyclerTweaks.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new TweakAdapter(this, (item, enabled, result) ->
+                Toast.makeText(this, item.name + ": " + result, Toast.LENGTH_LONG).show()
+        );
+        recyclerTweaks.setAdapter(adapter);
 
-        ramPage.addView(ramPanel);
-        tweaksPage.addView(tweaksPanel);
-        systemPage.addView(systemPanel);
+        tabRam = findViewById(R.id.tabRam);
+        tabTweaks = findViewById(R.id.tabTweaks);
+        tabSystem = findViewById(R.id.tabSystem);
 
-        content.addView(ramPage);
-        content.addView(tweaksPage);
-        content.addView(systemPage);
+        tabRam.setOnClickListener(v -> showPage(0));
+        tabTweaks.setOnClickListener(v -> showPage(1));
+        tabSystem.setOnClickListener(v -> showPage(2));
 
-        LinearLayout bottomBar = new LinearLayout(this);
-        bottomBar.setOrientation(LinearLayout.HORIZONTAL);
-        bottomBar.setGravity(Gravity.CENTER);
-        bottomBar.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        bottomBar.setPadding(16, 16, 16, 16);
+        BlurUtils.applySoftBlur(findViewById(R.id.blurLayer));
+        animateIn(findViewById(R.id.headerCard));
 
-        Button btnRam = new Button(this);
-        btnRam.setText("RAM");
-
-        Button btnTweaks = new Button(this);
-        btnTweaks.setText("TWEAKS");
-
-        Button btnSystem = new Button(this);
-        btnSystem.setText("SISTEMA");
-
-        LinearLayout.LayoutParams navParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        navParams.setMargins(8, 0, 8, 0);
-
-        btnRam.setLayoutParams(navParams);
-        btnTweaks.setLayoutParams(navParams);
-        btnSystem.setLayoutParams(navParams);
-
-        btnRam.setOnClickListener(v -> showPage(0));
-        btnTweaks.setOnClickListener(v -> showPage(1));
-        btnSystem.setOnClickListener(v -> showPage(2));
-
-        bottomBar.addView(btnRam);
-        bottomBar.addView(btnTweaks);
-        bottomBar.addView(btnSystem);
-
-        root.addView(content);
-        root.addView(bottomBar);
-
-        setContentView(root);
+        refreshRam();
+        refreshTweaks();
+        refreshSystem();
 
         showPage(0);
-        refreshAll();
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshAll();
-                handler.postDelayed(this, 1500);
-            }
-        }, 1500);
     }
 
-    private LinearLayout createPage() {
-        LinearLayout page = new LinearLayout(this);
-        page.setOrientation(LinearLayout.VERTICAL);
-        page.setPadding(32, 32, 32, 32);
-        page.setVisibility(View.GONE);
-
-        ScrollView scroll = new ScrollView(this);
-        scroll.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        ));
-
-        LinearLayout inner = new LinearLayout(this);
-        inner.setOrientation(LinearLayout.VERTICAL);
-        inner.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-
-        scroll.addView(inner);
-        page.addView(scroll);
-
-        return page;
-    }
-
-    private TextView createPanelText() {
-        TextView text = new TextView(this);
-        text.setTextSize(15f);
-        text.setPadding(8, 8, 8, 24);
-        return text;
-    }
-
-    private void showPage(int index) {
-        ramPage.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
-        tweaksPage.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
-        systemPage.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
-    }
-
-    private void refreshAll() {
+    @Override
+    protected void onResume() {
+        super.onResume();
         refreshRam();
         refreshTweaks();
         refreshSystem();
     }
 
+    private void showPage(int index) {
+        pageRam.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
+        recyclerTweaks.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
+        pageSystem.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
+
+        tabRam.setActivated(index == 0);
+        tabTweaks.setActivated(index == 1);
+        tabSystem.setActivated(index == 2);
+    }
+
     private void refreshRam() {
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        if (activityManager != null) {
-            activityManager.getMemoryInfo(memoryInfo);
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            am.getMemoryInfo(memoryInfo);
         }
 
-        long total = memoryInfo.totalMem;
-        long avail = memoryInfo.availMem;
-        long used = total - avail;
+        long totalRam = memoryInfo.totalMem;
+        long freeRam = memoryInfo.availMem;
+        long usedRam = totalRam - freeRam;
 
-        long dataTotal = getTotalStorage();
-        long dataFree = getFreeStorage();
-        long dataUsed = dataTotal - dataFree;
+        long totalStorage = getStorageTotal();
+        long freeStorage = getStorageFree();
+        long usedStorage = totalStorage - freeStorage;
 
-        ramPanel.setText(
-                "RAM\n\n" +
-                "Total: " + formatBytes(total) + "\n" +
-                "Usada: " + formatBytes(used) + "\n" +
-                "Libre: " + formatBytes(avail) + "\n\n" +
-                "Almacenamiento\n\n" +
-                "Total: " + formatBytes(dataTotal) + "\n" +
-                "Usado: " + formatBytes(dataUsed) + "\n" +
-                "Libre: " + formatBytes(dataFree) + "\n"
+        ramInfo.setText(
+                "Total: " + formatBytes(totalRam) + "\n" +
+                "Usada: " + formatBytes(usedRam) + "\n" +
+                "Libre: " + formatBytes(freeRam)
+        );
+
+        storageInfo.setText(
+                "Almacenamiento total: " + formatBytes(totalStorage) + "\n" +
+                "Almacenamiento usado: " + formatBytes(usedStorage) + "\n" +
+                "Almacenamiento libre: " + formatBytes(freeStorage)
         );
     }
 
     private void refreshTweaks() {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("TWEAKS INSTALADOS\n\n");
-
-        List<File> files = TWSRepository.listTweaks(this);
-        if (files.isEmpty()) {
-            builder.append("No hay tweaks instalados.\n");
-        } else {
-            for (File file : files) {
-                TWSProfile profile = TWSParser.parse(file);
-                builder.append("Nombre: ").append(profile.name).append('\n');
-                builder.append("Riesgo: ").append(profile.risk).append('\n');
-                builder.append("Acciones: ").append(profile.actions.size()).append('\n');
-                builder.append("Archivo: ").append(file.getName()).append('\n');
-                builder.append('\n');
-            }
-        }
-
-        builder.append("LECTOR .TWS\n\n");
-        File defaultFile = TWSRepository.getTweakFile(this, "gaming-mode");
-        if (defaultFile.exists()) {
-            TWSProfile profile = TWSParser.parse(defaultFile);
-            builder.append("Nombre: ").append(profile.name).append('\n');
-            builder.append("Descripción: ").append(profile.description).append('\n');
-            builder.append("Riesgo: ").append(profile.risk).append('\n');
-            builder.append("Compatibilidad mínima: Android ").append(profile.minAndroid).append('\n');
-            builder.append("Shizuku: ").append(profile.requiresShizuku ? "Sí" : "No").append('\n');
-            builder.append("Acciones:\n");
-            for (String action : profile.actions) {
-                builder.append(" - ").append(action).append('\n');
-            }
-        } else {
-            builder.append("gaming-mode.tws no existe todavía.\n");
-        }
-
-        tweaksPanel.setText(builder.toString());
+        List<File> files = TwsRepository.listTweaks(this);
+        adapter.setFiles(files);
     }
 
     private void refreshSystem() {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("SISTEMA\n\n");
-        builder.append("Modelo: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
-        builder.append("Android: ").append(Build.VERSION.RELEASE).append('\n');
-        builder.append("SDK: ").append(Build.VERSION.SDK_INT).append('\n');
-        builder.append("ABI: ").append(Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : "desconocida").append('\n');
-        builder.append('\n');
-        builder.append("Idioma: ").append(Locale.getDefault().getLanguage()).append('\n');
-
-        systemPanel.setText(builder.toString());
+        systemInfo.setText(
+                "Modelo: " + Build.MANUFACTURER + " " + Build.MODEL + "\n" +
+                "Android: " + Build.VERSION.RELEASE + "\n" +
+                "SDK: " + Build.VERSION.SDK_INT + "\n" +
+                "ABI: " + (Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : "desconocida") + "\n" +
+                "Idioma: " + Locale.getDefault().getLanguage()
+        );
     }
 
-    private long getTotalStorage() {
+    private long getStorageTotal() {
         StatFs statFs = new StatFs(getFilesDir().getAbsolutePath());
-        long blockSize = statFs.getBlockSizeLong();
-        long blockCount = statFs.getBlockCountLong();
-        return blockSize * blockCount;
+        return statFs.getBlockSizeLong() * statFs.getBlockCountLong();
     }
 
-    private long getFreeStorage() {
+    private long getStorageFree() {
         StatFs statFs = new StatFs(getFilesDir().getAbsolutePath());
-        long blockSize = statFs.getBlockSizeLong();
-        long availableBlocks = statFs.getAvailableBlocksLong();
-        return blockSize * availableBlocks;
+        return statFs.getBlockSizeLong() * statFs.getAvailableBlocksLong();
     }
 
     private String formatBytes(long bytes) {
@@ -271,5 +164,19 @@ public class MainActivity extends Activity {
         }
 
         return String.format(Locale.US, "%.2f %s", value, units[unit]);
+    }
+
+    private void animateIn(View view) {
+        if (view == null) {
+            return;
+        }
+        view.setAlpha(0f);
+        view.setTranslationY(30f);
+        view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(420)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .start();
     }
 }

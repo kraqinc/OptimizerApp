@@ -1,0 +1,17 @@
+package com.orionn.optimizer.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TweakItem {
+    public String name = "";
+    public String description = "";
+    public String risk = "low";
+    public String warning = "";
+    public int minAndroid = 23;
+    public boolean requiresShizuku = false;
+    public boolean enabled = false;
+    public final List<String> onEnable = new ArrayList<>();
+    public final List<String> onDisable = new ArrayList<>();
+    public String sourceFileName = "";
+}
