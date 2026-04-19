@@ -1,22 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#121212">
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_glow"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/tweakName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Tweak"
-        android:textColor="#FFFFFF"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tweakDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Descripción"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/tweakMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Meta"
+        android:textColor="@color/accent_2"
+        android:textSize="12sp" />
 
     <Switch
-        android:id="@+id/toggle"
+        android:id="@+id/tweakSwitch"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/text_primary" />
 </LinearLayout>
