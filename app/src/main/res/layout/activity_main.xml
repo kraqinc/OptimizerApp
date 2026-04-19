@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main">
+    android:background="#0B0D12">
 
     <View
         android:id="@+id/blurLayer"
@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="RAM"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Storage"
-                android:textColor="@color/text_secondary"
+                android:textColor="#9AA4B2"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="RAM"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFF"
                 android:textSize="22sp"
                 android:textStyle="bold" />
         </FrameLayout>
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="SYSTEM"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFF"
                 android:textSize="18sp" />
         </FrameLayout>
 
@@ -106,7 +106,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="RAM"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFF"
                 android:textStyle="bold" />
 
             <TextView
@@ -116,7 +116,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="TWEAKS"
-                android:textColor="@color/text_secondary"
+                android:textColor="#9AA4B2"
                 android:textStyle="bold" />
 
             <TextView
@@ -126,7 +126,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="SYSTEM"
-                android:textColor="@color/text_secondary"
+                android:textColor="#9AA4B2"
                 android:textStyle="bold" />
         </LinearLayout>
 
