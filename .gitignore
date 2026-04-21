@@ -1,8 +1,7 @@
 .gradle/
 build/
 app/build/
-out/
-*.apk
-*.class
 local.properties
-.DS_Store
+*.apk
+*.keystore
+*.jks

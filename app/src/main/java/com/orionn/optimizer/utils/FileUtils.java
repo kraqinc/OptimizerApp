@@ -74,8 +74,4 @@ public final class FileUtils {
 
         return builder.toString().trim();
     }
-
-    public static boolean exists(File file) {
-        return file != null && file.exists();
-    }
 }

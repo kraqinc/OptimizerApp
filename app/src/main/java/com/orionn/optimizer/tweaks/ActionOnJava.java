@@ -28,7 +28,7 @@ public final class ActionOnJava {
 
         List<String> reports = new ArrayList<>();
         for (String rawAction : actions) {
-            String result = executeAction(item, rawAction, enabled);
+            String result = executeAction(item, rawAction);
             if (result != null && !result.isEmpty()) {
                 reports.add(result);
             }
@@ -45,7 +45,7 @@ public final class ActionOnJava {
         return out.toString().trim();
     }
 
-    private static String executeAction(TweakItem item, String action, boolean enabled) {
+    private static String executeAction(TweakItem item, String action) {
         if (action == null) {
             return "";
         }
@@ -68,13 +68,10 @@ public final class ActionOnJava {
             command = "pm clear " + clean.substring(16).trim();
         } else if (lower.startsWith("set_anim:")) {
             String value = clean.substring(9).trim();
-            command = "settings put global window_animation_scale " + value +
-                    "; settings put global transition_animation_scale " + value +
-                    "; settings put global animator_duration_scale " + value;
+            command = "settings put global window_animation_scale " + value + "; settings put global transition_animation_scale " + value + "; settings put global animator_duration_scale " + value;
         } else if (lower.startsWith("set_refresh_rate:")) {
             String value = clean.substring(17).trim();
-            command = "settings put system peak_refresh_rate " + value +
-                    "; settings put system min_refresh_rate " + value;
+            command = "settings put system peak_refresh_rate " + value + "; settings put system min_refresh_rate " + value;
         } else if (lower.startsWith("low_power:")) {
             String value = clean.substring(10).trim();
             command = "settings put global low_power " + value;

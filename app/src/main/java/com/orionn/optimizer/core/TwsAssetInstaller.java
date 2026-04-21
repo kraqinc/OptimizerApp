@@ -33,7 +33,7 @@ public final class TwsAssetInstaller {
                 }
 
                 try (InputStream in = context.getAssets().open("tweaks_repo/" + name)) {
-                    FileUtils.copy(in, target);
+                    FileUtils.copyStream(in, target);
                     count++;
                 } catch (Exception ignored) {
                 }

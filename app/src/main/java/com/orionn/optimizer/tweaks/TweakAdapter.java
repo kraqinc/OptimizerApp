@@ -2,16 +2,18 @@ package com.orionn.optimizer.tweaks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.view.LayoutInflater;
+import android.graphics.Color;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.orionn.optimizer.R;
 import com.orionn.optimizer.core.TweakItem;
 import com.orionn.optimizer.core.TwsParser;
 
@@ -53,8 +55,57 @@ public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tweak, parent, false);
-        return new VH(view);
+        CardView card = new CardView(parent.getContext());
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        lp.bottomMargin = dp(12);
+        card.setLayoutParams(lp);
+        card.setUseCompatPadding(true);
+        card.setRadius(dp(20));
+        card.setCardBackgroundColor(Color.parseColor("#151515"));
+
+        LinearLayout root = new LinearLayout(parent.getContext());
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(dp(16), dp(16), dp(16), dp(16));
+        root.setLayoutParams(new CardView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+
+        TextView name = new TextView(parent.getContext());
+        name.setTextColor(Color.WHITE);
+        name.setTextSize(17f);
+        name.setText("Tweak");
+        name.setTypeface(name.getTypeface(), android.graphics.Typeface.BOLD);
+
+        TextView desc = new TextView(parent.getContext());
+        desc.setTextColor(Color.parseColor("#B0B0B0"));
+        desc.setTextSize(13f);
+        desc.setText("Descripción");
+
+        TextView meta = new TextView(parent.getContext());
+        meta.setTextColor(Color.parseColor("#7C4DFF"));
+        meta.setTextSize(11f);
+        meta.setPadding(0, dp(6), 0, 0);
+
+        Switch toggle = new Switch(parent.getContext());
+        LinearLayout.LayoutParams toggleLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        toggleLp.gravity = Gravity.END;
+        toggleLp.topMargin = dp(10);
+        toggle.setLayoutParams(toggleLp);
+
+        root.addView(name);
+        root.addView(desc);
+        root.addView(meta);
+        root.addView(toggle);
+        card.addView(root);
+
+        return new VH(card, name, desc, meta, toggle);
     }
 
     @Override
@@ -78,6 +129,8 @@ public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
             if (listener != null) {
                 listener.onChanged(item, isChecked, result);
             }
+
+            holder.itemView.setAlpha(isChecked ? 1f : 0.88f);
         });
     }
 
@@ -92,12 +145,17 @@ public class TweakAdapter extends RecyclerView.Adapter<TweakAdapter.VH> {
         final TextView meta;
         final Switch toggle;
 
-        VH(View itemView) {
+        VH(View itemView, TextView name, TextView desc, TextView meta, Switch toggle) {
             super(itemView);
-            name = itemView.findViewById(R.id.tweakName);
-            desc = itemView.findViewById(R.id.tweakDesc);
-            meta = itemView.findViewById(R.id.tweakMeta);
-            toggle = itemView.findViewById(R.id.tweakSwitch);
+            this.name = name;
+            this.desc = desc;
+            this.meta = meta;
+            this.toggle = toggle;
         }
+    }
+
+    private int dp(int value) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return Math.round(value * density);
     }
 }
